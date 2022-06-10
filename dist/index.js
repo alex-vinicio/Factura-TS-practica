@@ -48,6 +48,21 @@ var FaturaImp = /** @class */ (function () {
     FaturaImp.prototype.imprimirFactura = function () {
         return "****************************************\n\tFACTURACION AA\n****************************************\n".concat(this.id, "\tCliente:").concat(this.nombreCliente, "\n").concat(this.dirrecion, "\tFecha:").concat(this.fechaTransaccion.toLocaleDateString(), "\n****************************************\n").concat(this.productos.map(function (producto) { return producto.imprimirTabla(); }).join(""), "\nSubtotal: $").concat(this.subTotalPagar(), "\nIVA: (").concat(this.iva, "%)\nTotal: $").concat(this.totalConImpuestos(), "\n****************************************\n");
     };
+    FaturaImp.prototype.agregarProduto = function (prod) {
+        var aux = false;
+        this.productos.map(function (producto) {
+            if (prod.id == producto.id) {
+                console.log("El nuevo producto ".concat(producto.nombre, " ya tiene un id:").concat(producto.id, " asignado, incrementando ").concat(prod.cantidad, " al Stock!!"));
+                producto.cantidad += prod.cantidad;
+                producto.precioUnitario = prod.precioUnitario;
+                aux = true;
+                return;
+            }
+        });
+        if (!aux) {
+            this.productos.push(prod);
+        }
+    };
     return FaturaImp;
 }());
 var prod1 = new ProductoImp();
@@ -56,7 +71,7 @@ prod1.nombre = "Tomate";
 prod1.precioUnitario = 2;
 prod1.cantidad = 2;
 var prod2 = new ProductoImp();
-prod2.id = newUID();
+prod2.id = "123456";
 prod2.nombre = "Pepino";
 prod2.precioUnitario = 3;
 prod2.cantidad = 3;
@@ -71,4 +86,24 @@ fact.productos.push(prod1);
 fact.productos.push(prod2);
 fact.detalles = "La venta 1 de esta factura";
 //console.log(prod1.imprimirTabla(), prod2.imprimirTabla());
+console.log(fact.imprimirFactura());
+console.log("**************** Incrementar con el mismo Codigo ****************\n");
+var prodRepeat = new ProductoImp();
+prodRepeat.id = "123456";
+prodRepeat.nombre = "Pepino";
+prodRepeat.precioUnitario = 4;
+prodRepeat.cantidad = 3;
+fact.agregarProduto(prodRepeat);
+console.log(fact.imprimirFactura());
+console.log("**************** insertar n productos automaticamente ****************\n");
+var indexRandom = Math.floor(Math.random() * (1 - 100) + 100);
+console.log("Numero de productos a insertar: ".concat(indexRandom));
+for (var index = 0; index < indexRandom; index++) {
+    var prod = new ProductoImp();
+    prod.id = newUID();
+    prod.nombre = "Sal";
+    prod.precioUnitario = Math.floor(Math.random() * (1 - 8) + 8);
+    prod.cantidad = Math.floor(Math.random() * (1 - 20) + 20);
+    fact.agregarProduto(prod);
+}
 console.log(fact.imprimirFactura());

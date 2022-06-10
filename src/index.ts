@@ -77,6 +77,24 @@ class FaturaImp implements FacturaI {
     public imprimirFactura(): string {
         return `****************************************\n\tFACTURACION AA\n****************************************\n${this.id}\tCliente:${this.nombreCliente}\n${this.dirrecion}\tFecha:${this.fechaTransaccion.toLocaleDateString()}\n****************************************\n${this.productos.map((producto) => producto.imprimirTabla()).join("")}\nSubtotal: $${this.subTotalPagar()}\nIVA: (${this.iva}%)\nTotal: $${this.totalConImpuestos()}\n****************************************\n`;
     }
+
+    public agregarProduto(prod: ProductoImp): void {
+      var aux:boolean = false;
+
+      this.productos.map((producto) => {
+        if(prod.id == producto.id) {
+          console.log(`El nuevo producto ${producto.nombre} ya tiene un id:${producto.id} asignado, incrementando ${prod.cantidad} al Stock!!`);
+          producto.cantidad += prod.cantidad;
+          producto.precioUnitario = prod.precioUnitario;
+          aux = true;
+          return;
+        } 
+      });
+      
+      if(!aux) {
+        this.productos.push(prod);
+      }
+    }
 }
 
 var prod1 = new ProductoImp();
@@ -86,7 +104,7 @@ prod1.precioUnitario = 2;
 prod1.cantidad = 2;
 
 var prod2 = new ProductoImp();
-prod2.id = newUID();
+prod2.id = "123456";
 prod2.nombre = "Pepino";
 prod2.precioUnitario = 3;
 prod2.cantidad = 3;
@@ -104,4 +122,27 @@ fact.detalles = "La venta 1 de esta factura";
 
 
 //console.log(prod1.imprimirTabla(), prod2.imprimirTabla());
+console.log(fact.imprimirFactura());
+console.log(`**************** Incrementar con el mismo Codigo ****************\n`);
+var prodRepeat = new ProductoImp();
+prodRepeat.id = "123456";
+prodRepeat.nombre = "Pepino";
+prodRepeat.precioUnitario = 4;
+prodRepeat.cantidad = 3;
+fact.agregarProduto(prodRepeat);
+
+console.log(fact.imprimirFactura());
+
+console.log(`**************** insertar n productos automaticamente ****************\n`);
+
+let indexRandom = Math.floor(Math.random() * (1-100)+100);
+console.log(`Numero de productos a insertar: ${indexRandom}`);
+for (let index = 0; index < indexRandom; index++) {
+  let prod = new ProductoImp();
+  prod.id = newUID();
+  prod.nombre = "Sal";
+  prod.precioUnitario = Math.floor(Math.random() *(1-8)+8); 
+  prod.cantidad = Math.floor(Math.random() * (1-20)+20);
+  fact.agregarProduto(prod);
+}
 console.log(fact.imprimirFactura());
